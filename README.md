@@ -7,70 +7,80 @@ It is fully free and fully open source. The license is Apache 2.0, meaning you a
 
 ## Installation
 
-You can download the plugin from [rubygems](https://rubygems.org/gems/logstash-filter-denormalize) and install it from your logstash home directory like so:
+You can download the plugin from [rubygems](https://rubygems.org/gems/logstash-filter-yield) and install it from your logstash home directory like so:
 
-	bin/plugin install logstash-filter-denormalize-$VERSION.gem
+	bin/plugin install logstash-filter-yield-$VERSION.gem
 
 ## Purpose
 
-This filter will denormalize an event with a field of n values in an array into n differents events, which are the same except for the values in the array field. Each event will contain one of the array values in that field.  
-Basically, it behaves like the [split filter](https://www.elastic.co/guide/en/logstash/current/plugins-filters-split.html) but it splits on objects, not string sections.
+This filter will multiply an event into many. It is used for events which have an array field, if you want every entry in that array to become a separate event. 
+One usecase would be to separate lists of objects into separate elasticsearch documents for better aggregation.
 
 ### Examples
   
 Input event: 
 {
 	"host" => "machine4711"
-	"services" => ["elasticsearch","logstash","collectd"]
+	"services" => [ {"name" => "cpu-user", "value" => 42}, {"name" => "cpu-system", "value" => 23}, {"name" => "memory-free", "value" => 4711}]
 	"ip" => "10.1.2.3"
 }
 
 Output events:
 
+# the original event:
 {
 	"host" => "machine4711"
-	"services" => "elasticsearch"
+	"services" => [ {"name" => "cpu-user", "value" => 42}, {"name" => "cpu-system", "value" => 23}, {"name" => "memory-free", "value" => 4711}]
 	"ip" => "10.1.2.3"
 }
+# the new events
 {
-	"host" => "machine4711"
-	"services" => "logstash"
-	"ip" => "10.1.2.3"
+	"name" => "cpu-user"
+	"value" => 42
 }
 {
-	"host" => "machine4711"
-	"services" => "collectd"
-	"ip" => "10.1.2.3"
+	"name" => "cpu-system"
+	"value" => 23
+}
+{
+	"name" => "memory-free"
+	"value" => 4711
 }
 
-If the field, upon which the event is to be splitted, contains an array of key=>value nature, then those keys will be used in the new events:
-
-Input event: 
-{
-	"host" => "machine4711"
-	"attributes" => {
-					"ram" => "32g",
-					"cores" => 8
-					}
-	"ip" => "10.1.2.3"
-}
+You can add fields from the original event to the yielded documents, for example the host name:
 
 Output events:
+
+# the original event:
 {
 	"host" => "machine4711"
-	"ram" => "32g"
+	"services" => [ {"name" => "cpu-user", "value" => 42}, {"name" => "cpu-system", "value" => 23}, {"name" => "memory-free", "value" => 4711}]
 	"ip" => "10.1.2.3"
+}
+# the new events
+{
+	"host" => "machine4711"
+	"name" => "cpu-user"
+	"value" => 42
 }
 {
 	"host" => "machine4711"
-	"cores" => 8
-	"ip" => "10.1.2.3"
+	"name" => "cpu-system"
+	"value" => 23
+}
+{
+	"host" => "machine4711"
+	"name" => "memory-free"
+	"value" => 4711
 }
 
 ## Configuration
 
-* source 	: name of the field by which to denormalize. For each entry in this field (which should have an array value) a new record will be created, containing all the other fields. 
-* target	: new key for the field by which you splitted the event. This is only effective if the splitted field didn't have keys on its own.
+* source 				: name of the field that the filter should split on. Must be an array and contain objects (will not work on string arrays e.g.)
+* copy					: list of field names that should be copied into the new events (in the above example this would be "host")
+
+It is recommended to also use the config add_tag so that you can separate the yielded from the original documents and send them to different outputs.
+# TODO example
 
 
 ## Contributing

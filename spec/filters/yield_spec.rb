@@ -1,18 +1,40 @@
 # encoding: utf-8
 require "logstash/devutils/rspec/spec_helper"
-require "logstash/filters/denormalize"
+require "logstash/filters/yield"
 require "logstash/event"
 
-describe LogStash::Filters::Denormalize do
+describe LogStash::Filters::Yield do
 
-  context "when field is a list" do
-    it "should not raise exception" do
-      filter = LogStash::Filters::Denormalize.new({"source" => "my_array"})
-      event = LogStash::Event.new("my_array" => ["cat","dog"])
+  context "when event has 3 child objects" do
+    it "should generate 3 new events" do
+      filter = LogStash::Filters::Yield.new({"source" => "services"})
+      event = LogStash::Event.new(
+              "host" => "machine4711",
+              "services" => [ {"name" => "cpu-user", "value" => 42}, {"name" => "cpu-system", "value" => 23}, {"name" => "memory-free", "value" => 4711}],
+              "ip" => "10.1.2.3")
       
-      expect {filter.filter(event).length}.to eq(2)
+      expect {filter.filter(event).length}.to eq(4)
     end
   end
+
+  context "when event has 3 child objects and copy config" do
+    it "should copy the fields from the original event" do
+      filter = LogStash::Filters::Yield.new({"source" => "services", "copy_fields" => [ "host"]})
+      event = LogStash::Event.new(
+              "host" => "machine4711",
+              "services" => [ {"name" => "cpu-user", "value" => 42}, {"name" => "cpu-system", "value" => 23}, {"name" => "memory-free", "value" => 4711}],
+              "ip" => "10.1.2.3")
+      outcome = filter.filter(event)
+      expect {outcome[0].['ip']}.to eq("10.1.2.3") # test that original event is still in there
+      expect {outcome[1].['name']}.to eq("cpu-user")
+      expect {outcome[2].['name']}.to eq("cpu-system")
+      expect {outcome[2].['value']}.to eq(23)
+      expect {outcome[3].['value']}.to eq(4711)
+      expect {outcome[3].['host']}.to eq("machine4711")
+      expect {outcome[1].['host']}.to eq("machine4711")
+    end
+  end
+
 
 
 =begin
