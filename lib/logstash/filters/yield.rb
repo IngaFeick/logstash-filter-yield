@@ -13,6 +13,14 @@ class LogStash::Filters::Yield < LogStash::Filters::Base
   # list of field names that should be copied into the new events
   config :copy_fields, :validate => :array, :default => []
 
+  # optional tag to identify the new events
+  config :tag, :validate => :string, :default => nil
+
+  # optional prefix for new field names
+  config :prefix, :validate => :string, :default => nil
+
+
+
   public
   def register
     # nothing to do here
@@ -26,20 +34,34 @@ class LogStash::Filters::Yield < LogStash::Filters::Base
         objectlist.each do |some_object|
           new_event = LogStash::Event.new
           new_event['@timestamp'] = event['@timestamp']
+          puts "new event start: " + new_event.inspect.to_s
 
           # add all fields from objectlist to the event
-          if some_object.is_a?(::Hash) # TODO what about objects?
+          if some_object.is_a?(::Hash) 
             some_object.each do |key, value|
-              new_event[key] = value
+              puts "new event: add field " + key.to_s + " with value " + value.to_s 
+              new_event[key.to_s] = value
             end
           end
 
           # copy all the needed fields from the mother event
           if (@copy_fields.is_a? Enumerable)
             @copy_fields.each do |take_me_with_you|
-              new_event[take_me_with_you] = event[take_me_with_you]
+              puts "new event: copy field " + take_me_with_you.to_s
+              if !@prefix.nil?
+                key = @prefix + take_me_with_you.to_s
+              else
+                key = take_me_with_you.to_s
+              end
+              new_event[key] = event[take_me_with_you]
             end
           end 
+
+          if !@tag.nil?
+            new_event["tags"] = [@tag]
+          end
+
+          puts "new event final: " + new_event.inspect.to_s
           filter_matched(new_event)
           yield new_event
           # event.cancel # maybe offer this as a config option
