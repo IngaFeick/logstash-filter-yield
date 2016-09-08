@@ -25,13 +25,13 @@ describe LogStash::Filters::Yield do
               "services" => [ {"name" => "cpu-user", "value" => 42}, {"name" => "cpu-system", "value" => 23}, {"name" => "memory-free", "value" => 4711}],
               "ip" => "10.1.2.3")
       outcome = filter.filter(event)
-      expect {outcome[0].['ip']}.to eq("10.1.2.3") # test that original event is still in there
-      expect {outcome[1].['name']}.to eq("cpu-user")
-      expect {outcome[2].['name']}.to eq("cpu-system")
-      expect {outcome[2].['value']}.to eq(23)
-      expect {outcome[3].['value']}.to eq(4711)
-      expect {outcome[3].['host']}.to eq("machine4711")
-      expect {outcome[1].['host']}.to eq("machine4711")
+      expect {outcome[0]['ip']}.to eq("10.1.2.3") # test that original event is still in there
+      expect {outcome[1]['name']}.to eq("cpu-user")
+      expect {outcome[2]['name']}.to eq("cpu-system")
+      expect {outcome[2]['value']}.to eq(23)
+      expect {outcome[3]['value']}.to eq(4711)
+      expect {outcome[3]['host']}.to eq("machine4711")
+      expect {outcome[1]['host']}.to eq("machine4711")
     end
   end
 

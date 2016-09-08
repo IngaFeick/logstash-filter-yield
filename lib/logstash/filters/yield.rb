@@ -3,7 +3,7 @@ require "logstash/filters/base"
 require "logstash/namespace"
 
 # TODO docu
-class LogStash::Filters::yield < LogStash::Filters::Base
+class LogStash::Filters::Yield < LogStash::Filters::Base
   
   config_name "yield"
 

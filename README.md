@@ -28,51 +28,51 @@ Input event:
 Output events:
 
 # the original event:
-{
-	"host" => "machine4711"
-	"services" => [ {"name" => "cpu-user", "value" => 42}, {"name" => "cpu-system", "value" => 23}, {"name" => "memory-free", "value" => 4711}]
-	"ip" => "10.1.2.3"
-}
+	{
+		"host" => "machine4711"
+		"services" => [ {"name" => "cpu-user", "value" => 42}, {"name" => "cpu-system", "value" => 23}, {"name" => "memory-free", "value" => 4711}]
+		"ip" => "10.1.2.3"
+	}
 # the new events
-{
-	"name" => "cpu-user"
-	"value" => 42
-}
-{
-	"name" => "cpu-system"
-	"value" => 23
-}
-{
-	"name" => "memory-free"
-	"value" => 4711
-}
+	{
+		"name" => "cpu-user"
+		"value" => 42
+	}
+	{
+		"name" => "cpu-system"
+		"value" => 23
+	}
+	{
+		"name" => "memory-free"
+		"value" => 4711
+	}
 
 You can add fields from the original event to the yielded documents, for example the host name:
 
 Output events:
 
-# the original event:
-{
-	"host" => "machine4711"
-	"services" => [ {"name" => "cpu-user", "value" => 42}, {"name" => "cpu-system", "value" => 23}, {"name" => "memory-free", "value" => 4711}]
-	"ip" => "10.1.2.3"
-}
-# the new events
-{
-	"host" => "machine4711"
-	"name" => "cpu-user"
-	"value" => 42
-}
-{
-	"host" => "machine4711"
-	"name" => "cpu-system"
-	"value" => 23
-}
-{
-	"host" => "machine4711"
-	"name" => "memory-free"
-	"value" => 4711
-}
+	# the original event:
+	{
+		"host" => "machine4711"
+		"services" => [ {"name" => "cpu-user", "value" => 42}, {"name" => "cpu-system", "value" => 23}, {"name" => "memory-free", "value" => 4711}]
+		"ip" => "10.1.2.3"
+	}
+	# the new events
+	{
+		"host" => "machine4711"
+		"name" => "cpu-user"
+		"value" => 42
+	}
+	{
+		"host" => "machine4711"
+		"name" => "cpu-system"
+		"value" => 23
+	}
+	{
+		"host" => "machine4711"
+		"name" => "memory-free"
+		"value" => 4711
+	}
 
 ## Configuration
 
