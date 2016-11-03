@@ -77,7 +77,8 @@ Output events:
 ## Configuration
 
 * source 				: name of the field that the filter should split on. Must be an array and contain objects (will not work on string arrays e.g.)
-* copy					: list of field names that should be copied into the new events (in the above example this would be "host")
+* copy_fields			: list of field names that should be copied into the new events (in the above example this would be "host")
+* tag 					: a tag to be added to the newly created event (but not to the original event)
 
 It is recommended to also use the config add_tag so that you can separate the yielded from the original documents and send them to different outputs.
 # TODO example
