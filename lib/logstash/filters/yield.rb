@@ -34,12 +34,12 @@ class LogStash::Filters::Yield < LogStash::Filters::Base
         objectlist.each do |some_object|
           new_event = LogStash::Event.new
           new_event['@timestamp'] = event['@timestamp']
-          puts "new event start: " + new_event.inspect.to_s
+          #@logger.debug("new event start: " + new_event.inspect.to_s)
 
           # add all fields from objectlist to the event
           if some_object.is_a?(::Hash) 
             some_object.each do |key, value|
-              puts "new event: add field " + key.to_s + " with value " + value.to_s 
+              #@logger.debug("new event: add field " + key.to_s + " with value " + value.to_s)
               new_event[key.to_s] = value
             end
           end
@@ -47,7 +47,7 @@ class LogStash::Filters::Yield < LogStash::Filters::Base
           # copy all the needed fields from the mother event
           if (@copy_fields.is_a? Enumerable)
             @copy_fields.each do |take_me_with_you|
-              puts "new event: copy field " + take_me_with_you.to_s
+              #@logger.debug( "new event: copy field " + take_me_with_you.to_s)
               if !@prefix.nil?
                 key = @prefix + take_me_with_you.to_s
               else
@@ -61,16 +61,16 @@ class LogStash::Filters::Yield < LogStash::Filters::Base
             new_event["tags"] = [@tag]
           end
 
-          puts "new event final: " + new_event.inspect.to_s
+          #@logger.debug( "new event final: " + new_event.inspect.to_s)
           filter_matched(new_event)
           yield new_event
           # event.cancel # maybe offer this as a config option
         end # do    
       else
-        @logger.debug("Not iterable: field " + @source + " with some_object " + objectlist.to_s)
+        #@logger.debug("Not iterable: field " + @source + " with some_object " + objectlist.to_s)
       end
     else
-       @logger.debug("Nil: field " + @source)
+      #@logger.debug("Nil: field " + @source)
     end # if objectlist.nil? 
 
   end # def filter  
